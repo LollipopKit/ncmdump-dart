@@ -139,11 +139,10 @@ class NCM {
   Uint8List _readMusic() {
     final music = List<int>.empty(growable: true);
     var chunk = Uint8List(musicChunkReadLength);
-    for (var chunkLen = 0;
-        chunkLen < _raw!.length;
-        chunkLen += musicChunkReadLength) {
-      chunk = _raw!.sublist(0, chunkLen + musicChunkReadLength);
-      _raw = _raw!.sublist(chunkLen + musicChunkReadLength);
+    while (_raw!.length > 0) {
+      final readLength = _raw!.length < musicChunkReadLength ? _raw!.length : musicChunkReadLength;
+      chunk = _raw!.sublist(0, readLength);
+      _raw = _raw!.sublist(readLength);
       for (var i = 1; i < chunk.length + 1; i++) {
         final j = i & 0xff;
         chunk[i - 1] ^= key[(key[j] + key[(key[j] + j) & 0xff]) & 0xff];
