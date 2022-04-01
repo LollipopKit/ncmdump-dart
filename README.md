@@ -12,7 +12,6 @@ await File('a.${ncm.meta.format}').writeAsBytes(ncm.music);
 
 
 ### Test
-If you want to use your own `.ncm` file.  
 Please copy your .ncm file to `test/assets/a.ncm`.  
 And run the following command to test.
 ```bash
