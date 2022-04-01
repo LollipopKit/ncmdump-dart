@@ -1,6 +1,6 @@
 name: ncmdump
 description: Decrypt .ncm file and convert it to normal music format.
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/LollipopKit/ncmdump-dart
 
 environment:
@@ -8,6 +8,7 @@ environment:
 
 dependencies:
   encrypt: ^5.0.1
+  args: ^2.3.0
 
 dev_dependencies:
   test: ^1.6.5

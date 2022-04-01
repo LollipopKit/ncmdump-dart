@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 extension Uint8ListX on Uint8List {
+  /// convert to hex string
   String get hex {
     var s = '';
     for (final element in this) {
@@ -9,8 +10,10 @@ extension Uint8ListX on Uint8List {
     return s;
   }
 
+  /// convert to string
   String get string => String.fromCharCodes(this);
 
+  /// convert 4 bytes to int (length)
   int getLength() {
     int len = 0;
     len |= this[0] & 0xff;
@@ -22,11 +25,13 @@ extension Uint8ListX on Uint8List {
 }
 
 extension ByteDataX on ByteData {
+  /// bytedata to string
   String get string {
     return buffer.asUint8List().string;
   }
 }
 
+/// hex string to string
 String hexParse(String hex) {
   final len = hex.length ~/ 2;
   var s = '';

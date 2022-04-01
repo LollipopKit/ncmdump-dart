@@ -1,3 +1,7 @@
 ## 0.0.1
 
-* TODO: Describe initial release.
+* Support parse .ncm file.
+
+## 0.0.2
+
+* Fix NCM._readMusic() chunk length error.

@@ -1,3 +1,5 @@
+/// json raw:
+/// `["Artist Name", Artist ID Int]`
 class Artist {
   String? name;
   int? id;

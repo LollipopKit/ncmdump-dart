@@ -8,6 +8,16 @@ import 'package:ncmdump/src/constant.dart';
 import 'package:ncmdump/src/ext/convert.dart';
 import 'package:ncmdump/src/model/meta.dart';
 
+/// Example:
+/// ```dart
+/// final ncm = NCM();
+/// final raw = await File('a.ncm').readAsBytes();
+/// final target = await File('a.mp3').readAsBytes();
+/// ncm.setRaw(raw);
+/// ncm.parse();
+/// // music data
+/// print(ncm.music);
+/// ```
 class NCM {
   Uint8List? _raw;
   late String _magicHeader;
@@ -29,8 +39,11 @@ class NCM {
         Encrypter(AES(Key.fromUtf8(hexParse(metaKeyHex)), mode: AESMode.ecb));
   }
 
+  /// Set raw data. [raw] must be a valid NCM file bytes.
   void setRaw(Uint8List raw) => _raw = raw;
 
+  /// Parse raw data.
+  /// If [_raw] is not set, please call [setRaw] first.
   void parse() {
     if (_raw == null) throw Exception('must call setRaw(Uint8List raw) first.');
 
@@ -67,6 +80,8 @@ class NCM {
   Uint8List _readKey() {
     final data = _raw!.sublist(0, _keyLength);
     _raw = _raw!.sublist(_keyLength);
+
+    /// CR4-KSA
     for (var i = 0; i < data.length; i++) {
       data[i] ^= 0x64;
     }
@@ -75,6 +90,7 @@ class NCM {
     return _decryptKey(keyData);
   }
 
+  /// CR4-PRGA
   Uint8List _decryptKey(Uint8List raw) {
     final keyBox = List<int>.generate(256, (index) => index);
     var c = 0;
@@ -138,12 +154,13 @@ class NCM {
 
   Uint8List _readMusic() {
     final music = List<int>.empty(growable: true);
-    var chunk = Uint8List(musicChunkReadLength);
     while (_raw!.length > 0) {
-      final readLength = _raw!.length < musicChunkReadLength ? _raw!.length : musicChunkReadLength;
-      chunk = _raw!.sublist(0, readLength);
+      final readLength = _raw!.length < musicChunkReadLength
+          ? _raw!.length
+          : musicChunkReadLength;
+      var chunk = _raw!.sublist(0, readLength);
       _raw = _raw!.sublist(readLength);
-      for (var i = 1; i < chunk.length + 1; i++) {
+      for (var i = 1; i < readLength + 1; i++) {
         final j = i & 0xff;
         chunk[i - 1] ^= key[(key[j] + key[(key[j] + j) & 0xff]) & 0xff];
       }

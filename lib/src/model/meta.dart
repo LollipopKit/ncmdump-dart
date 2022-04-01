@@ -11,7 +11,7 @@ class Meta {
   "musicName": "いつかどこかで (Album Version)",
   "artist": [
     [
-      "□□□(クチロロ)"
+      "□□□(クチロロ)", 1231231
     ]
   ],
   "album": "マンパワー",

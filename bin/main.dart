@@ -84,5 +84,5 @@ void main(List<String> args) async {
       break;
     }
   }
-  print('\n[FINISH] Spent $timeResult $timeSuffix.');
+  print('\n[FINISH] Spent ${timeResult.toStringAsFixed(2)} $timeSuffix.');
 }
