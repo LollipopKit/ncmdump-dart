@@ -20,10 +20,12 @@ void main(List<String> args) async {
       defaultsTo: false,
       abbr: 'r',
       help: 'convert all files in sub-directories and this directory');
+  parser.addFlag('delete', abbr: 'd', help: 'delete converted ncm files');
   final result = parser.parse(args);
   final path = result.rest.first;
-  final override = result['override'];
-  final recursive = result['recursive'];
+  final override = result['override'] as bool;
+  final recursive = result['recursive'] as bool;
+  final delete = result['delete'] as bool;
 
   final filePaths = <String>[];
 
@@ -44,6 +46,7 @@ void main(List<String> args) async {
   final ncm = NCM();
 
   var idx = 1;
+  var skipCount = 0;
   for (final filePath in filePaths) {
     final file = File(filePath);
     var exist = false;
@@ -58,16 +61,20 @@ void main(List<String> args) async {
     if (!override && exist) {
       print('[SKIP] $filePath');
       idx++;
+      skipCount++;
       continue;
     }
 
-    ncm.setRaw(await file.readAsBytes());
-    ncm.parse();
+    ncm.parse(await file.readAsBytes());
     final targetName = filePath.replaceAll(NCM_SUFFIX, '.${ncm.meta.format}');
     final targetFile = File(targetName);
 
     await targetFile.writeAsBytes(ncm.music);
     print('[$idx/$taskNum]  $targetName');
+    if (delete) {
+      await file.delete();
+      print('[DELETE] $filePath');
+    }
     idx++;
   }
 
@@ -84,5 +91,6 @@ void main(List<String> args) async {
       break;
     }
   }
-  print('\n[FINISH] Spent ${timeResult.toStringAsFixed(2)} $timeSuffix.');
+  print(
+      '\n[FINISH] Converted $taskNum songs (skip $skipCount) in ${timeResult.toStringAsFixed(2)} $timeSuffix.');
 }

@@ -5,8 +5,7 @@ Decrypt .ncm file and convert it to normal music format.
 final ncm = NCM();
 
 final raw = await File('a.ncm').readAsBytes();
-ncm.setRaw(raw);
-ncm.parse();
+ncm.parse(raw);
 await File('a.${ncm.meta.format}').writeAsBytes(ncm.music);
 ```
 

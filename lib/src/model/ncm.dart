@@ -8,15 +8,13 @@ import 'package:ncmdump/src/constant.dart';
 import 'package:ncmdump/src/ext/convert.dart';
 import 'package:ncmdump/src/model/meta.dart';
 
-/// Example:
+/// Construct a new NCM instance.
+/// ## Example:
 /// ```dart
 /// final ncm = NCM();
 /// final raw = await File('a.ncm').readAsBytes();
-/// final target = await File('a.mp3').readAsBytes();
-/// ncm.setRaw(raw);
-/// ncm.parse();
-/// // music data
-/// print(ncm.music);
+/// ncm.parse(raw);
+/// await File('a.${ncm.meta.format}').writeAsBytes(ncm.music);
 /// ```
 class NCM {
   Uint8List? _raw;
@@ -28,25 +26,20 @@ class NCM {
   late int _imageSize;
   late Uint8List image;
   late Uint8List music;
-  late Encrypter _coreCryptor;
-  late Encrypter _metaCryptor;
-  late IV _iv;
+  final Encrypter _coreCryptor;
+  final Encrypter _metaCryptor;
+  final IV _iv;
 
-  NCM() {
-    _iv = IV.fromLength(0);
-    _coreCryptor = Encrypter(AES(Key.fromUtf8(coreKeyStr), mode: AESMode.ecb));
-    _metaCryptor =
-        Encrypter(AES(Key.fromUtf8(hexParse(metaKeyHex)), mode: AESMode.ecb));
-  }
+  NCM()
+      : _iv = IV.fromLength(0),
+        _coreCryptor =
+            Encrypter(AES(Key.fromUtf8(coreKeyStr), mode: AESMode.ecb)),
+        _metaCryptor = Encrypter(
+            AES(Key.fromUtf8(hexParse(metaKeyHex)), mode: AESMode.ecb));
 
-  /// Set raw data. [raw] must be a valid NCM file bytes.
-  void setRaw(Uint8List raw) => _raw = raw;
-
-  /// Parse raw data.
-  /// If [_raw] is not set, please call [setRaw] first.
-  void parse() {
-    if (_raw == null) throw Exception('must call setRaw(Uint8List raw) first.');
-
+  /// Parse raw ncm data.
+  void parse(Uint8List raw) {
+    _raw = raw;
     try {
       _magicHeader = _readMagicHeader();
       assert(_magicHeader == magicHeaderValue);
@@ -154,7 +147,7 @@ class NCM {
 
   Uint8List _readMusic() {
     final music = List<int>.empty(growable: true);
-    while (_raw!.length > 0) {
+    while (_raw!.isNotEmpty) {
       final readLength = _raw!.length < musicChunkReadLength
           ? _raw!.length
           : musicChunkReadLength;
